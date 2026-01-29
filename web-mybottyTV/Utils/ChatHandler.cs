@@ -12,10 +12,8 @@ namespace web_mybottyTV.Utils
     public static class ChatHandler
     {
         private static ChatService? _chat = null;
-        // Регулярное выражение для захвата {key}
         private static readonly Regex PlaceholderRegex = new(@"\{(?<key>[^{}]+)\}", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-        // Словарь плейсхолдеров -> получение значения из ChatMessage
         private static readonly IReadOnlyDictionary<string, Func<ChatService, string?>> PlaceholderGetters =
             new Dictionary<string, Func<ChatService, string?>>(StringComparer.OrdinalIgnoreCase)
             {
@@ -31,7 +29,6 @@ namespace web_mybottyTV.Utils
             if (msg is null) return string.Empty;
             if (args is null) return msg;
 
-            // Быстрая проверка чтобы избегать лишних аллокаций
             if (!msg.Contains('{')) return msg;
 
             var result = PlaceholderRegex.Replace(msg, m =>
