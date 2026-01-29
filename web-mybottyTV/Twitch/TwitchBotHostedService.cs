@@ -25,7 +25,6 @@ namespace web_mybottyTV.Twitch
             _logger = logger;
             _botSettingsMonitor = botSettingsMonitor;
 
-            // Подписаться на изменения конфигурации (reloadOnChange)
             _botSettingsMonitor.OnChange(cfg => _logger.LogInformation("BotSettings changed"));
         }
 
