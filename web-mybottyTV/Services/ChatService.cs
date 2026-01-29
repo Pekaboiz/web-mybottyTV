@@ -7,9 +7,10 @@ using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Interfaces;
 using Utils;
-using web_mybottyTV.Twitch;
+using web_mybottyTV.Services;
+using web_mybottyTV.Utils;
 
-namespace web_mybottyTV.Utils
+namespace web_mybottyTV.Service
 {
     public class ChatService
     {
@@ -73,7 +74,7 @@ namespace web_mybottyTV.Utils
             {
                 var botUsers = await _api.Helix.Users.GetUsersAsync(logins: new List<string> { _service.BotName });
                 _chatUtils.BotUserId = botUsers.Users.FirstOrDefault()?.Id;
-                _chatUtils.GetIdByLogin(_service.ChannelName.Replace("#", ""));
+                //_chatUtils.GetIdByLogin(_service.ChannelName);
             }
             catch (Exception ex)
             {
@@ -83,7 +84,7 @@ namespace web_mybottyTV.Utils
 
         public BotSettings? GetMySettings(string channelName)
         {
-            _botSettings = _botSettingsMonitor.CurrentValue.BotSettings.Where(c => c.ChannelName.Replace("#", "") == channelName).FirstOrDefault();
+            _botSettings = _botSettingsMonitor.CurrentValue.BotSettings.Where(c => c.ChannelName == channelName).FirstOrDefault();
 
             if (_botSettings != null) return _botSettings;
             else return null;

@@ -1,0 +1,42 @@
+﻿@page
+@model web_mybottyTV.Pages.IndexModel
+
+@if (Model.Channel == null)
+{
+    <p>Не удалось определить ваш канал. Войдите через Twitch.</p>
+}
+else
+{
+    <h1>Управление каналом @Model.Channel.ChannelName</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Команда</th>
+                <th>Действие</th>
+                <th>Ответ</th>
+                <th>Вкл.</th>
+                <th>Редактировать</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cmd in Model.Channel.Settings)
+            {
+                <tr>
+                    <td>@cmd.CommandName</td>
+                    <td>@cmd.ActionType</td>
+                    <td>@cmd.Response</td>
+                    <td>@cmd.IsEnabled</td>
+                    <td>
+                        <a asp-page="/EditCommand"
+                           asp-route-command="@cmd.CommandName">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-page="/AddCommand">Добавить новую команду</a>
+}

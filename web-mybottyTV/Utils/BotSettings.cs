@@ -9,8 +9,8 @@ namespace Utils
 
     public class BotSettings
     {
-        public string? ChannelName { get; init; } = "#xxxxxx";
-        public string? Oauth { get; init; } = "xxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public string? ChannelName { get; init; } = "#xxx";
+        public string? Oauth { get; init; } = "xxx";
 
         public int MaxWarns { get; init; } = 3;
 

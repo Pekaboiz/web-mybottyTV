@@ -1,4 +1,4 @@
-﻿namespace web_mybottyTV.Twitch
+﻿namespace web_mybottyTV.Services
 {
     public class TwitchService
     {
@@ -6,6 +6,7 @@
         public string OAuthToken { get; }
         public string BotName { get; }
         public string ChannelName { get; }
+        public string URL { get; }
 
         public TwitchService() 
         { 
@@ -13,6 +14,7 @@
             OAuthToken = Environment.GetEnvironmentVariable("OAUTH_TOKEN")!;
             BotName = Environment.GetEnvironmentVariable("BOT_NAME")!;
             ChannelName = Environment.GetEnvironmentVariable("TEMP_CHANNEL")!;
+            URL = Environment.GetEnvironmentVariable("BASE_API_URL")!;
         }
     }
 }

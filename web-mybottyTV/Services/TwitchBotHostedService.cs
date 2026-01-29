@@ -4,9 +4,10 @@ using TwitchLib.Client.Enums;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using Utils;
+using web_mybottyTV.Services;
 using web_mybottyTV.Utils;
 
-namespace web_mybottyTV.Twitch
+namespace web_mybottyTV.Service
 {
     public class TwitchBotHostedService : BackgroundService
     {
@@ -52,7 +53,7 @@ namespace web_mybottyTV.Twitch
         private async Task OnConnected(object? sender, OnConnectedEventArgs e)
         {
             _logger.LogInformation("Connected as {Bot}", e.BotUsername);
-            await _client!.JoinChannelAsync(_service.ChannelName);
+            await _client!.JoinChannelAsync("#"+_service.ChannelName);
         }
 
         private async Task OnMessageReceived(object? sender, OnMessageReceivedArgs e)
@@ -66,6 +67,8 @@ namespace web_mybottyTV.Twitch
 
                 string? channelName = e.ChatMessage.Channel;
 
+                _chat.ChatData.GetIdByLogin(e.ChatMessage.Channel);
+
                 _chat.GetMySettings(channelName);
 
                 if (_chat.BotSettings is null) return;
@@ -75,6 +78,8 @@ namespace web_mybottyTV.Twitch
                 _logger.LogInformation("{User}: {Message}",
                      e.ChatMessage.Username,
                      e.ChatMessage.Message);
+                
+                _chat.User.GetOrCreateUser(e.ChatMessage);
 
                 _ = HandleChatMassageAsync(e.ChatMessage);
             }
@@ -85,9 +90,7 @@ namespace web_mybottyTV.Twitch
         }
 
         private async Task HandleChatMassageAsync(ChatMessage chatMsg)
-        {
-            _chat.User.GetOrCreateUser(chatMsg);
-
+        { 
             string? message = chatMsg.Message;
             string? channelName = chatMsg.Channel;
 

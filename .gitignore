@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .env
+/web-mybottyTV/config/botsettings.json
+/web-mybottyTV/.env

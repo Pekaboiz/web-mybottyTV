@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using TwitchLib.Api;
 using Utils;
+using web_mybottyTV.Service;
 
 namespace web_mybottyTV.Utils
 {
@@ -16,7 +17,7 @@ namespace web_mybottyTV.Utils
             _api = api;
         }
 
-        public void GetIdByLogin(string login) => BroadcasterId = BroadcasterIds[login];
+        public void GetIdByLogin(string login) => BroadcasterId = BroadcasterIds[login] ?? null;
 
         private async void SetIdByLogin(string login)
         {
@@ -45,7 +46,7 @@ namespace web_mybottyTV.Utils
                 var cfgs = botSettingsMonitor.CurrentValue?.BotSettings ?? Array.Empty<BotSettings>();
                 foreach (var cfg in cfgs)
                 {
-                    var login = cfg.ChannelName?.Replace("#", "")?.Trim();
+                    var login = cfg.ChannelName;
 
                     if (!string.IsNullOrWhiteSpace(login))
                         SetIdByLogin(login);

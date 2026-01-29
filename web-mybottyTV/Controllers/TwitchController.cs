@@ -1,22 +1,36 @@
 using Microsoft.AspNetCore.Mvc;
+using Utils;
 
 namespace web_mybottyTV.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class TwitchController : ControllerBase
     {
-        private readonly ILogger<TwitchController> _logger;
+        private readonly BotSettingsService _service;
 
-        public TwitchController(ILogger<TwitchController> logger)
+        public TwitchController(BotSettingsService service)
         {
-            _logger = logger;
+            _service = service;
         }
 
-        [HttpGet(Name = "GetTwitch")]
-        public string Get()
+        [HttpGet("user={channel}")]
+        public BotSettings GetChannel(string channel)
         {
-            return "aaaaa";
+            return _service.GetChannel(channel);
+        }
+
+        [HttpGet("users")]
+        public BotSettings[] GetChannel()
+        {
+            return _service.GetChannel();
+        }
+
+        [HttpPost("{channel}/command")]
+        public IActionResult AddCommand(string channel)
+        {
+            //_service.AddCommand(channel, cmd);
+            return Ok();
         }
     }
 }
