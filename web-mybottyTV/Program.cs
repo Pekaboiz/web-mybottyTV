@@ -25,7 +25,7 @@ namespace web_mybottyTV
             // Привязываем настройки бота и регистрируем в DI
             builder.Configuration.AddJsonFile("config/botsettings.json", optional: true, reloadOnChange: true);
             builder.Services.Configure<BotSettingsStorage>(builder.Configuration.GetSection("BotSettingsStorage"));
-            
+
             // Регистрируем Twitch
             builder.Services.AddSingleton<TwitchService>();
             builder.Services.AddHostedService<TwitchBotHostedService>();

@@ -16,8 +16,13 @@ public class BotSettingsService
     public BotSettings GetChannel(string username) => _storage.BotSettings
                                                                 .FirstOrDefault(bs => bs.ChannelName.Equals(username, StringComparison.OrdinalIgnoreCase))
                                                                 ?? new BotSettings();
-
+    
     public BotSettings[] GetChannel() => _storage.BotSettings;
+
+    public BaseSettings GetSettings(string channel, string commandName)
+    {
+        return _storage.BotSettings.FirstOrDefault(c => c.ChannelName == channel).Settings.FirstOrDefault(c => c.CommandName == commandName);
+    }
 
     public void Save()
     {

@@ -6,15 +6,13 @@
         public string OAuthToken { get; }
         public string BotName { get; }
         public string ChannelName { get; }
-        public string URL { get; }
-
+        
         public TwitchService() 
         { 
             ClientId = Environment.GetEnvironmentVariable("CLIENT_ID")!;
             OAuthToken = Environment.GetEnvironmentVariable("OAUTH_TOKEN")!;
             BotName = Environment.GetEnvironmentVariable("BOT_NAME")!;
             ChannelName = Environment.GetEnvironmentVariable("TEMP_CHANNEL")!;
-            URL = Environment.GetEnvironmentVariable("BASE_API_URL")!;
         }
     }
 }

@@ -20,6 +20,12 @@ namespace web_mybottyTV.Controllers
             return _service.GetChannel(channel);
         }
 
+        [HttpGet("user={channel}/cmd={commandName}")]
+        public BaseSettings GetSettings(string channel, string commandName)
+        {
+            return _service.GetSettings(channel, commandName);
+        }
+
         [HttpGet("users")]
         public BotSettings[] GetChannel()
         {

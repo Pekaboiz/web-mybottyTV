@@ -5,7 +5,7 @@ using web_mybottyTV.Service;
 
 namespace web_mybottyTV.Utils
 {
-    public class ChatUtils : ChatService
+    public class ChatUtils 
     {
         private TwitchAPI _api;
         public string? BotUserId { get; internal set; }

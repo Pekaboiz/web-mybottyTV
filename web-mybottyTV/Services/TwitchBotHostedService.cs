@@ -15,7 +15,10 @@ namespace web_mybottyTV.Service
         private readonly ILogger<TwitchBotHostedService> _logger;
         private readonly IOptionsMonitor<BotSettingsStorage> _botSettingsMonitor;
         private TwitchClient _client = new TwitchClient();
-        private ChatService _chat = new ChatService();
+        private readonly HttpClient _http;
+        private ChatService _chat;
+
+
 
         public TwitchBotHostedService(
             TwitchService service,
@@ -31,7 +34,7 @@ namespace web_mybottyTV.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _chat = new ChatService();
+            _chat = new ChatService(_http);
             _chat.Initialize(_service, _logger, _botSettingsMonitor);
 
             _client = _chat.Client;

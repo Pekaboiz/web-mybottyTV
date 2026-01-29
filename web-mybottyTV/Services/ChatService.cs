@@ -29,7 +29,7 @@ namespace web_mybottyTV.Service
         private BaseSettings? _config;
         private UsersUtils _usersUtils = new UsersUtils();
 
-        public ChatService()
+        public ChatService(HttpClient http)
         {
             _client = new TwitchClient();
             _api = new TwitchAPI();
@@ -82,12 +82,21 @@ namespace web_mybottyTV.Service
             }
         }
 
-        public BotSettings? GetMySettings(string channelName)
+        public async Task<BotSettings>? GetMySettings(string channelName)
         {
-            _botSettings = _botSettingsMonitor.CurrentValue.BotSettings.Where(c => c.ChannelName == channelName).FirstOrDefault();
+            using var client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:5220/");
 
-            if (_botSettings != null) return _botSettings;
-            else return null;
+            try
+            {
+                _botSettings = await client.GetFromJsonAsync<BotSettings>($"/twitch/user={channelName}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Incorrect api");
+            }
+
+            return _botSettings;
         }
 
         public BaseSettings? GetConfig(ChatMessage e)
