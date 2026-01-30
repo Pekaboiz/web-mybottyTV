@@ -1,9 +1,10 @@
-using System;
 using dotenv.net;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
 using Utils;
+using web_mybottyTV.API;
 using web_mybottyTV.Service;
 using web_mybottyTV.Services;
 
@@ -22,6 +23,11 @@ namespace web_mybottyTV
             builder.Services.AddRazorPages();   
             builder.Services.AddOpenApi();
 
+            builder.Services.AddHttpClient<TwitchApiClient>(client =>
+            {
+                client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("BASE_API_URL")!);
+            });
+
             // Привязываем настройки бота и регистрируем в DI
             builder.Configuration.AddJsonFile("config/botsettings.json", optional: true, reloadOnChange: true);
             builder.Services.Configure<BotSettingsStorage>(builder.Configuration.GetSection("BotSettingsStorage"));
@@ -39,6 +45,7 @@ namespace web_mybottyTV
             }
 
             //app.UseHttpsRedirection(); // SSL
+            app.UseStaticFiles();
             app.UseRouting();
             app.MapRazorPages();    
             app.UseAuthorization();

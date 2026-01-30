@@ -1,14 +1,13 @@
-﻿using Microsoft.Extensions.Options;
-using System.ComponentModel.Design;
+﻿using Utils;
 using TwitchLib.Api;
 using TwitchLib.Client;
-using TwitchLib.Client.Enums;
-using TwitchLib.Client.Events;
-using TwitchLib.Client.Models;
-using TwitchLib.Communication.Interfaces;
-using Utils;
-using web_mybottyTV.Services;
+using web_mybottyTV.API;
 using web_mybottyTV.Utils;
+using web_mybottyTV.Services;
+using TwitchLib.Client.Enums;
+using TwitchLib.Client.Models;
+using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
 
 namespace web_mybottyTV.Service
 {
@@ -29,11 +28,14 @@ namespace web_mybottyTV.Service
         private BaseSettings? _config;
         private UsersUtils _usersUtils = new UsersUtils();
 
-        public ChatService(HttpClient http)
+        private TwitchApiClient _twitchApi;
+
+        public ChatService(TwitchApiClient twitchApi)
         {
             _client = new TwitchClient();
             _api = new TwitchAPI();
             _apiBroadcaster = new TwitchAPI();
+            _twitchApi = twitchApi;
         }
 
         public void Initialize(TwitchService service, ILogger<TwitchBotHostedService> logger, IOptionsMonitor<BotSettingsStorage> botSettingsMonitor)
@@ -84,46 +86,34 @@ namespace web_mybottyTV.Service
 
         public async Task<BotSettings>? GetMySettings(string channelName)
         {
-            using var client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:5220/");
-
-            try
-            {
-                _botSettings = await client.GetFromJsonAsync<BotSettings>($"/twitch/user={channelName}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Incorrect api");
-            }
-
+            _botSettings = await _twitchApi.GetUsersAsync(channelName);
+            
             return _botSettings;
         }
 
-        public BaseSettings? GetConfig(ChatMessage e)
+        public async Task<BotSettings[]>? GetAll()
+        {
+            return await _twitchApi.GetAllUsersAsync();
+        }
+
+        public async Task<BaseSettings>? GetConfig(ChatMessage e)
         {
             if (_botSettings is null)
                 return null;
 
-            string command = e.Message;
+            string command = e.Message.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
 
-            _config = _botSettings.Settings.FirstOrDefault(s =>
-                                string.IsNullOrWhiteSpace(s.CommandName) ||
-                                command.StartsWith(
-                                    s.CommandName,
-                                    s.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase
-                                )
-                                && s.IsEnabled
-                            );
+            _config = await _twitchApi.GetSettingsAsync(e.Channel, command);
 
             return _config;
         }
 
-        public BaseSettings? GetConfig(string command)
+        public async Task<BaseSettings> GetConfig(string command)
         {
             if (_botSettings == null)
                 return null;
 
-            _config = _botSettings.Settings.Where(cmd => command.Contains(cmd.CommandName)).Where(c => c.IsEnabled).FirstOrDefault();
+            _config = await _twitchApi.GetSettingsAsync(_botSettings.ChannelName!, command);
 
             return _config ?? null;
         }

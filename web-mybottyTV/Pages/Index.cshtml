@@ -1,42 +1,50 @@
 ﻿@page
 @model web_mybottyTV.Pages.IndexModel
+@{
+    Layout = "_Layout"; 
+}
 
 @if (Model.Channel == null)
 {
-    <p>Не удалось определить ваш канал. Войдите через Twitch.</p>
+    <div class="alert alert-warning">
+        Не удалось определить ваш канал. Пожалуйста, войдите через Twitch.
+    </div>
 }
 else
 {
-    <h1>Управление каналом @Model.Channel.ChannelName</h1>
+    <div class="channel-management">
+        <h1>Управление каналом <span class="channel-name">@Model.Channel.ChannelName</span></h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Команда</th>
-                <th>Действие</th>
-                <th>Ответ</th>
-                <th>Вкл.</th>
-                <th>Редактировать</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var cmd in Model.Channel.Settings)
-            {
+        <table class="commands-table">
+            <thead>
                 <tr>
-                    <td>@cmd.CommandName</td>
-                    <td>@cmd.ActionType</td>
-                    <td>@cmd.Response</td>
-                    <td>@cmd.IsEnabled</td>
-                    <td>
-                        <a asp-page="/EditCommand"
-                           asp-route-command="@cmd.CommandName">
-                            Edit
-                        </a>
-                    </td>
+                    <th>Команда</th>
+                    <th>Действие</th>
+                    <th>Ответ</th>
+                    <th>Вкл.</th>
+                    <th>Редактировать</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var cmd in Model.Channel.Settings)
+                {
+                    <tr>
+                        <td>@cmd.CommandName</td>
+                        <td>@cmd.ActionType</td>
+                        <td>@cmd.Response</td>
+                        <td>
+                            <input type="checkbox" disabled @(cmd.IsEnabled ? "checked" : "") />
+                        </td>
+                        <td>
+                            <a class="edit-link" asp-page="/EditCommand" asp-route-command="@cmd.CommandName">
+                                Редактировать
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
-    <a asp-page="/AddCommand">Добавить новую команду</a>
+        <a class="add-command-link" asp-page="/AddCommand">➕ Добавить новую команду</a>
+    </div>
 }

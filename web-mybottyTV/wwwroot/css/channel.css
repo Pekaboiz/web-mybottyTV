@@ -1,0 +1,49 @@
+﻿.channel-management {
+    max-width: 900px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+}
+
+.channel-name {
+    color: #6441a5; 
+}
+
+.commands-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+    .commands-table th,
+    .commands-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .commands-table th {
+        background-color: #f3f3f3;
+    }
+
+    .commands-table tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+
+.edit-link,
+.add-command-link {
+    color: #6441a5;
+    text-decoration: none;
+}
+
+    .edit-link:hover,
+    .add-command-link:hover {
+        text-decoration: underline;
+    }
+
+.alert {
+    padding: 10px 15px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 5px;
+    color: #856404;
+}

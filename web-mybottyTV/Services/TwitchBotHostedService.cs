@@ -1,11 +1,14 @@
 ﻿using Microsoft.Extensions.Options;
+using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Enums;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using Utils;
+using web_mybottyTV.API;
 using web_mybottyTV.Services;
 using web_mybottyTV.Utils;
+using static System.Net.WebRequestMethods;
 
 namespace web_mybottyTV.Service
 {
@@ -18,23 +21,24 @@ namespace web_mybottyTV.Service
         private readonly HttpClient _http;
         private ChatService _chat;
 
-
+        private TwitchApiClient _twitchApi;
 
         public TwitchBotHostedService(
             TwitchService service,
             ILogger<TwitchBotHostedService> logger,
-            IOptionsMonitor<BotSettingsStorage> botSettingsMonitor)
+            IOptionsMonitor<BotSettingsStorage> botSettingsMonitor,
+            TwitchApiClient twitchApi)
         {
             _service = service;
             _logger = logger;
             _botSettingsMonitor = botSettingsMonitor;
-
+            _twitchApi = twitchApi;
             _botSettingsMonitor.OnChange(cfg => _logger.LogInformation("BotSettings changed"));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _chat = new ChatService(_http);
+            _chat = new ChatService(_twitchApi);
             _chat.Initialize(_service, _logger, _botSettingsMonitor);
 
             _client = _chat.Client;
@@ -56,7 +60,11 @@ namespace web_mybottyTV.Service
         private async Task OnConnected(object? sender, OnConnectedEventArgs e)
         {
             _logger.LogInformation("Connected as {Bot}", e.BotUsername);
-            await _client!.JoinChannelAsync("#"+_service.ChannelName);
+            var users = await _chat.GetAll();
+            foreach (var user in users) 
+            { 
+                await _client!.JoinChannelAsync("#"+ user.ChannelName);
+            }
         }
 
         private async Task OnMessageReceived(object? sender, OnMessageReceivedArgs e)
@@ -72,7 +80,7 @@ namespace web_mybottyTV.Service
 
                 _chat.ChatData.GetIdByLogin(e.ChatMessage.Channel);
 
-                _chat.GetMySettings(channelName);
+                await _chat.GetMySettings(channelName);
 
                 if (_chat.BotSettings is null) return;
 
@@ -102,7 +110,7 @@ namespace web_mybottyTV.Service
 
             if (ChatHandler.IsCommand(message))
             {
-                _chat.GetConfig(chatMsg);
+                await _chat.GetConfig(chatMsg);
                 _chat.ChatConfig.Chat = chatMsg;
 
                 if (!_chat.IsUserHavePermission(chatMsg.UserType))
@@ -116,7 +124,7 @@ namespace web_mybottyTV.Service
             }
             else
             {
-                _chat.GetConfig("#CAPS_CHECK#");
+                await _chat.GetConfig("CAPSCHECK");
                 _chat.ChatConfig.Chat = chatMsg;
 
                 if (chatMsg.UserType == UserType.Viewer && ChatHandler.IsCapsViolation(message, _chat.ChatConfig.CapsLimit))

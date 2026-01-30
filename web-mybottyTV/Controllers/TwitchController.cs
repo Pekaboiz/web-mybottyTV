@@ -14,22 +14,15 @@ namespace web_mybottyTV.Controllers
             _service = service;
         }
 
-        [HttpGet("user={channel}")]
-        public BotSettings GetChannel(string channel)
-        {
-            return _service.GetChannel(channel);
-        }
-
-        [HttpGet("user={channel}/cmd={commandName}")]
-        public BaseSettings GetSettings(string channel, string commandName)
-        {
-            return _service.GetSettings(channel, commandName);
-        }
-
         [HttpGet("users")]
-        public BotSettings[] GetChannel()
+        public IActionResult GetChannel([FromQuery] string? login, [FromQuery] string? command = null)
         {
-            return _service.GetChannel();
+            if (login == null)
+               return Ok(_service.GetChannel());
+            else if (command is null) 
+               return Ok(_service.GetChannel(login));
+            else
+               return Ok(_service.GetSettings(login, command));
         }
 
         [HttpPost("{channel}/command")]
