@@ -4,35 +4,35 @@
     Layout = "_Layout"; 
 }
 
-@if (!User.Identity?.IsAuthenticated ?? true)
+@if ((!User.Identity?.IsAuthenticated ?? true) || (Model.Channel is null))
 {
-    <a href="/auth/login">Войти через Twitch</a>
+    <a href="/auth/login">Login with Twitch</a>
 }
 else
 {
     <span>@User.Identity?.Name</span>
-    <a href="/auth/logout">Выйти</a>
+    <a href="/auth/logout">Logout</a>
 }
 
-@if (!User.Identity?.IsAuthenticated == true)
+@if ((!User.Identity?.IsAuthenticated == true) || (Model.Channel is null))
 {
     <div class="alert alert-warning">
-        Не удалось определить ваш канал. Пожалуйста, войдите через Twitch.
+        Ur channel is incorrect. Please, use Twitch to login.
     </div>
 }
 else
 {
     <div class="channel-management">
-        <h1>Управление каналом <span class="channel-name">@Model.Channel.ChannelName</span></h1>
+        <h1>Channel managment <span class="channel-name">@Model.Channel.ChannelName</span></h1>
 
         <table class="commands-table">
             <thead>
                 <tr>
-                    <th>Команда</th>
-                    <th>Действие</th>
-                    <th>Ответ</th>
-                    <th>Вкл.</th>
-                    <th>Редактировать</th>
+                    <th>Command</th>
+                    <th>Action</th>
+                    <th>Answer</th>
+                    <th>Is Enabled.</th>
+                    <th>Edit</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,7 +47,7 @@ else
                         </td>
                         <td>
                             <a class="edit-link" asp-page="/EditCommand" asp-route-command="@cmd.CommandName">
-                                Редактировать
+                                Edit
                             </a>
                         </td>
                     </tr>
@@ -55,6 +55,6 @@ else
             </tbody>
         </table>
 
-        <a class="add-command-link" asp-page="/AddCommand">➕ Добавить новую команду</a>
+        <a class="add-command-link" asp-page="/AddCommand">➕ Add new command</a>
     </div>
 }

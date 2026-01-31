@@ -20,6 +20,9 @@ public class IndexModel : PageModel
     {
         var login = User.Identity?.Name;
 
-        Channel = _settingsService.GetChannel(login);
+        if (login is not null)
+        {
+            Channel = _settingsService.GetChannel(login);
+        }
     }
 }
