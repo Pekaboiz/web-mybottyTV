@@ -18,7 +18,6 @@ namespace web_mybottyTV.Service
         private readonly ILogger<TwitchBotHostedService> _logger;
         private readonly IOptionsMonitor<BotSettingsStorage> _botSettingsMonitor;
         private TwitchClient _client = new TwitchClient();
-        private readonly HttpClient _http;
         private ChatService _chat;
 
         private TwitchApiClient _twitchApi;

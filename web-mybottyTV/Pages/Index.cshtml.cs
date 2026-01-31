@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using Utils;
 using web_mybottyTV.Utils;
 
@@ -17,8 +18,8 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
-        var username = "peki4";
+        var login = User.Identity?.Name;
 
-        Channel = _settingsService.GetChannel(username);
+        Channel = _settingsService.GetChannel(login);
     }
 }

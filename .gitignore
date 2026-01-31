@@ -365,3 +365,4 @@ FodyWeavers.xsd
 .env
 /web-mybottyTV/config/botsettings.json
 /web-mybottyTV/.env
+/web-mybottyTV/appsettings.json

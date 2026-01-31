@@ -4,7 +4,17 @@
     Layout = "_Layout"; 
 }
 
-@if (Model.Channel == null)
+@if (!User.Identity?.IsAuthenticated ?? true)
+{
+    <a href="/auth/login">Войти через Twitch</a>
+}
+else
+{
+    <span>@User.Identity?.Name</span>
+    <a href="/auth/logout">Выйти</a>
+}
+
+@if (!User.Identity?.IsAuthenticated == true)
 {
     <div class="alert alert-warning">
         Не удалось определить ваш канал. Пожалуйста, войдите через Twitch.

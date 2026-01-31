@@ -1,6 +1,6 @@
-@web_mybottyTV_HostAddress = http://localhost:5220
+@web_mybottyTV_HostAddress = https://localhost:5001
 
-GET {{web_mybottyTV_HostAddress}}/weatherforecast/
+GET {{web_mybottyTV_HostAddress}}
 Accept: application/json
 
 ###

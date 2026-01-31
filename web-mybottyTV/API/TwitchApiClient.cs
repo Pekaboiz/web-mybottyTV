@@ -6,9 +6,9 @@ namespace web_mybottyTV.API
     {
         private readonly HttpClient _http;
 
-        public TwitchApiClient(HttpClient http)
+        public TwitchApiClient(IHttpClientFactory httpFactory)
         {
-            _http = http;
+            _http = httpFactory.CreateClient("internal-api");
         }
 
         public async Task<BotSettings[]> GetAllUsersAsync()
