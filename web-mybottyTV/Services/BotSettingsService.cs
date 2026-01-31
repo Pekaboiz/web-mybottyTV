@@ -1,36 +1,39 @@
-﻿using Microsoft.Extensions.Options;
-using System.Text.Json;
-using Utils;
-using web_mybottyTV.Utils;
+﻿using Utils;
 
 public class BotSettingsService
 {
-    private readonly string _filePath = "config/botsettings.json";
-    private BotSettingsStorage _storage = new BotSettingsStorage();
+    private readonly Dictionary<string, BotSettings> _channels =
+        new(StringComparer.OrdinalIgnoreCase);
 
-    public BotSettingsService(IOptions<BotSettingsStorage> options)
+    public void ReplaceAll(IEnumerable<BotSettings> channels)
     {
-        _storage = options.Value;
+        _channels.Clear();
+
+        foreach (var channel in channels)
+        {
+            _channels[channel.ChannelName] = channel;
+        }
     }
 
-    public BotSettings GetChannel(string username) => _storage.BotSettings
-                                                                .FirstOrDefault(bs => bs.ChannelName.Equals(username, StringComparison.OrdinalIgnoreCase))
-                                                                ?? new BotSettings();
-    
-    public BotSettings[] GetChannel() => _storage.BotSettings;
-
-    public BaseSettings GetSettings(string channel, string commandName)
+    public void Upsert(BotSettings channel)
     {
-        return _storage.BotSettings.FirstOrDefault(c => c.ChannelName == channel).Settings.FirstOrDefault(c => c.CommandName == commandName);
+        _channels[channel.ChannelName] = channel;
     }
 
-    public void Save()
+    public BotSettings? GetChannel(string channel)
     {
-        var json = JsonSerializer.Serialize(
-            _storage,
-            new JsonSerializerOptions { WriteIndented = true }
-        );
+        _channels.TryGetValue(channel, out var settings);
+        return settings;
+    }
 
-        File.WriteAllText(_filePath, json);
+    public IReadOnlyCollection<BotSettings> GetAllChannels() => _channels.Values;
+
+    public BaseSettings? GetSettings(string channel, string command)
+    {
+        if (!_channels.TryGetValue(channel, out var ch))
+            return null;
+
+        return ch.Settings.FirstOrDefault(c =>
+            c.CommandName.Equals(command, StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -1,44 +1,49 @@
 ﻿using Microsoft.Extensions.Options;
-using TwitchLib.Api;
+using System.Runtime;
 using TwitchLib.Client;
 using TwitchLib.Client.Enums;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using Utils;
 using web_mybottyTV.API;
-using web_mybottyTV.Services;
 using web_mybottyTV.Utils;
-using static System.Net.WebRequestMethods;
 
-namespace web_mybottyTV.Service
+namespace web_mybottyTV.Services
 {
     public class TwitchBotHostedService : BackgroundService
     {
         private readonly TwitchService _service;
         private readonly ILogger<TwitchBotHostedService> _logger;
-        private readonly IOptionsMonitor<BotSettingsStorage> _botSettingsMonitor;
+        private readonly ChannelConfigProvider _configProvider;
+        private readonly BotSettingsService _settings;
         private TwitchClient _client = new TwitchClient();
         private ChatService _chat;
 
         private TwitchApiClient _twitchApi;
-
+        private BotSettings[] _botSettings;
+        private BotSettingsStorage _storage;
+        
         public TwitchBotHostedService(
             TwitchService service,
-            ILogger<TwitchBotHostedService> logger,
-            IOptionsMonitor<BotSettingsStorage> botSettingsMonitor,
-            TwitchApiClient twitchApi)
+            TwitchApiClient twitchApi,
+            BotSettingsService settings,
+            ChannelConfigProvider configProvider,
+            ILogger<TwitchBotHostedService> logger)
         {
             _service = service;
             _logger = logger;
-            _botSettingsMonitor = botSettingsMonitor;
             _twitchApi = twitchApi;
-            _botSettingsMonitor.OnChange(cfg => _logger.LogInformation("BotSettings changed"));
+            _configProvider = configProvider;
+            _settings = settings;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _storage = await _configProvider.ReloadAllChannelAsync();
+            _botSettings = _storage.BotSettings;
+
             _chat = new ChatService(_twitchApi);
-            _chat.Initialize(_service, _logger, _botSettingsMonitor);
+            _chat.Initialize(_service, _logger, _storage);
 
             _client = _chat.Client;
 
@@ -59,9 +64,13 @@ namespace web_mybottyTV.Service
         private async Task OnConnected(object? sender, OnConnectedEventArgs e)
         {
             _logger.LogInformation("Connected as {Bot}", e.BotUsername);
-            var users = await _chat.GetAll();
+            var channels = await _configProvider.ReloadAllChannelAsync();
+            var users = _botSettings;
+            
+            _settings.ReplaceAll(users);
+            
             foreach (var user in users) 
-            { 
+            {
                 await _client!.JoinChannelAsync("#"+ user.ChannelName);
             }
         }

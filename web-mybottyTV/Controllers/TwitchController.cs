@@ -18,7 +18,7 @@ namespace web_mybottyTV.Controllers
         public IActionResult GetChannel([FromQuery] string? login, [FromQuery] string? command = null)
         {
             if (login == null)
-               return Ok(_service.GetChannel());
+               return Ok(_service.GetAllChannels());
             else if (command is null) 
                return Ok(_service.GetChannel(login));
             else

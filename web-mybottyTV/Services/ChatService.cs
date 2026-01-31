@@ -3,13 +3,11 @@ using TwitchLib.Api;
 using TwitchLib.Client;
 using web_mybottyTV.API;
 using web_mybottyTV.Utils;
-using web_mybottyTV.Services;
 using TwitchLib.Client.Enums;
 using TwitchLib.Client.Models;
 using Microsoft.Extensions.Options;
-using System.Text.RegularExpressions;
 
-namespace web_mybottyTV.Service
+namespace web_mybottyTV.Services
 {
     public class ChatService
     {
@@ -23,7 +21,7 @@ namespace web_mybottyTV.Service
 
         private bool _initialized;
 
-        private IOptionsMonitor<BotSettingsStorage> _botSettingsMonitor;
+        private BotSettingsStorage _botStorage;
         private BotSettings? _botSettings;
         private BaseSettings? _config;
         private UsersUtils _usersUtils = new UsersUtils();
@@ -38,14 +36,14 @@ namespace web_mybottyTV.Service
             _twitchApi = twitchApi;
         }
 
-        public void Initialize(TwitchService service, ILogger<TwitchBotHostedService> logger, IOptionsMonitor<BotSettingsStorage> botSettingsMonitor)
+        public void Initialize(TwitchService service, ILogger<TwitchBotHostedService> logger, BotSettingsStorage botStorage)
         {
             if (_initialized)
                 throw new InvalidOperationException("ChatService уже инициализирован");
 
             _logger = logger;
             _service = service;
-            _botSettingsMonitor = botSettingsMonitor;
+            _botStorage = botStorage;
 
             var credentials = new ConnectionCredentials(
                 _service.BotName,
@@ -66,11 +64,15 @@ namespace web_mybottyTV.Service
 
         private async void SetDataChat()
         {
-            if (_chatUtils == null)
+            if (_chatUtils is null)
             {
                 _chatUtils = new ChatUtils(_api);
             }
-            _chatUtils.GetBroadcasters(_botSettingsMonitor);
+
+            if (_botStorage is not null)
+            {
+                _chatUtils.GetBroadcasters(_botStorage);
+            }
 
             try
             {

@@ -6,7 +6,7 @@ using TwitchLib.Api.Helix.Models.Channels.ModifyChannelInformation;
 using TwitchLib.Api.Helix.Models.Moderation.BanUser;
 using TwitchLib.Client.Models;
 using Utils;
-using web_mybottyTV.Service;
+using web_mybottyTV.Services;
 
 namespace web_mybottyTV.Utils
 {

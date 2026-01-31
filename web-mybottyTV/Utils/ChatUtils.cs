@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using TwitchLib.Api;
 using Utils;
-using web_mybottyTV.Service;
+using web_mybottyTV.Services;
 
 namespace web_mybottyTV.Utils
 {
@@ -39,11 +39,11 @@ namespace web_mybottyTV.Utils
             }
         }
 
-        public async void GetBroadcasters(IOptionsMonitor<BotSettingsStorage> botSettingsMonitor)
+        public async void GetBroadcasters(BotSettingsStorage botStrorage)
         {
             try
             {
-                var cfgs = botSettingsMonitor.CurrentValue?.BotSettings ?? Array.Empty<BotSettings>();
+                var cfgs = botStrorage?.BotSettings ?? Array.Empty<BotSettings>();
                 foreach (var cfg in cfgs)
                 {
                     var login = cfg.ChannelName;

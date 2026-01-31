@@ -1,7 +1,6 @@
 using dotenv.net;
 using Utils;
 using web_mybottyTV.API;
-using web_mybottyTV.Service;
 using web_mybottyTV.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -15,19 +14,18 @@ namespace web_mybottyTV
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Загружаем .env ДО DI
             DotEnv.Load();
 
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContextFactory<AppDbContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<ChannelBootstrapService>();
 
             builder.Services.AddControllers();
-            builder.Services.AddRazorPages();   
+            builder.Services.AddRazorPages();
             builder.Services.AddOpenApi();
 
-            builder.Services.AddHttpClient("internal-api", client =>
+            builder.Services.AddHttpClient<TwitchApiClient>(client =>
             {
                 client.BaseAddress = new Uri(
                     Environment.GetEnvironmentVariable("BASE_API_URL")!
@@ -35,21 +33,17 @@ namespace web_mybottyTV
             });
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/auth/login";
-                options.LogoutPath = "/auth/logout";
-            });
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/auth/login";
+                    options.LogoutPath = "/auth/logout";
+                });
 
-            // Привязываем настройки бота и регистрируем в DI
-            builder.Configuration.AddJsonFile("config/botsettings.json", optional: true, reloadOnChange: true);
-            builder.Services.Configure<BotSettingsStorage>(builder.Configuration.GetSection("BotSettingsStorage"));
-
-            // Регистрируем Twitch
-            builder.Services.AddSingleton<TwitchApiClient>();
+            builder.Services.AddSingleton<ChannelConfigProvider>();
             builder.Services.AddSingleton<TwitchService>();
-            builder.Services.AddHostedService<TwitchBotHostedService>();
             builder.Services.AddSingleton<BotSettingsService>();
+
+            builder.Services.AddHostedService<TwitchBotHostedService>();
 
             var app = builder.Build();
 
@@ -58,10 +52,8 @@ namespace web_mybottyTV
                 app.MapOpenApi();
             }
 
-            //app.UseHttpsRedirection(); // SSL
             app.UseStaticFiles();
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -69,6 +61,7 @@ namespace web_mybottyTV
             app.MapControllers();
 
             app.Run();
+
         }
     }
 }

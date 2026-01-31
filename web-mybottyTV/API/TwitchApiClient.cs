@@ -6,9 +6,9 @@ namespace web_mybottyTV.API
     {
         private readonly HttpClient _http;
 
-        public TwitchApiClient(IHttpClientFactory httpFactory)
+        public TwitchApiClient(HttpClient http)
         {
-            _http = httpFactory.CreateClient("internal-api");
+            _http = http;
         }
 
         public async Task<BotSettings[]> GetAllUsersAsync()
@@ -27,6 +27,13 @@ namespace web_mybottyTV.API
         {
             return await _http.GetFromJsonAsync<BaseSettings>($"twitch/users?login={Uri.EscapeDataString(login)}&command={cmd}")
                 ?? throw new InvalidOperationException("Empty response");
+        }
+
+        internal async Task PushUserAsync(string id, BotSettings config)
+        {
+            var response = await _http.PostAsJsonAsync($"twitch/users?login={id}", config);
+
+            response.EnsureSuccessStatusCode();
         }
     }
 }
